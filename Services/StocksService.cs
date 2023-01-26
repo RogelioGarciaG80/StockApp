@@ -46,7 +46,7 @@ namespace Services
                 //Model validations
                 ValidationHelper.ModelValidation(sellOrderRequest);
                 SellOrder sellOrder = sellOrderRequest.ToSellOrder();
-                sellOrder.BuyOrderID = Guid.NewGuid();
+                sellOrder.SellOrderID = Guid.NewGuid();
                 _sellOrders.Add(sellOrder);
                 return sellOrder.ToSellOrderResponse();
             });

@@ -9,7 +9,7 @@ namespace ServiceContracts.DTO
 {
     public class SellOrderResponse
     {
-        public Guid BuyOrderID { get; set; }
+        public Guid SellOrderID { get; set; }
         public string? StockSymbol { get; set; }
         public string? StockName { get; set; }
         public DateTime DateAndTimeOfOrder { get; set; }
@@ -20,7 +20,7 @@ namespace ServiceContracts.DTO
         public override string ToString()
         {
             //return base.ToString();
-            return $"BuyOrder ID: {BuyOrderID}, Stock Symbol: {StockSymbol}, Stock Name: {StockName}, Date and Time Of Order: {DateAndTimeOfOrder}, Quantity {Quantity}, Price: {Price}, TradeAmount: {TradeAmount}  ";
+            return $"BuyOrder ID: {SellOrderID}, Stock Symbol: {StockSymbol}, Stock Name: {StockName}, Date and Time Of Order: {DateAndTimeOfOrder}, Quantity {Quantity}, Price: {Price}, TradeAmount: {TradeAmount}  ";
         }
 
         public override bool Equals(object? obj)
@@ -31,7 +31,7 @@ namespace ServiceContracts.DTO
 
             SellOrderResponse sellOrderResponse = (SellOrderResponse)obj;
 
-            return this.BuyOrderID == sellOrderResponse.BuyOrderID &&
+            return this.SellOrderID == sellOrderResponse.SellOrderID &&
                 this.StockName == sellOrderResponse.StockName &&
                 this.StockSymbol == sellOrderResponse.StockSymbol &&
                 this.DateAndTimeOfOrder == sellOrderResponse.DateAndTimeOfOrder &&
@@ -55,7 +55,7 @@ namespace ServiceContracts.DTO
             {
                 StockName = sellOrder.StockName,
                 StockSymbol = sellOrder.StockSymbol,
-                BuyOrderID= sellOrder.BuyOrderID,
+                SellOrderID= sellOrder.SellOrderID,
                 DateAndTimeOfOrder = sellOrder.DateAndTimeOfOrder,
                 Quantity = sellOrder.Quantity,
                 Price = sellOrder.Price,
