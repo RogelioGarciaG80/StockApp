@@ -187,7 +187,7 @@ namespace StocksTest
                 Price = 129.13
             };
             SellOrderResponse? buyOrderResponse = await _stocksService.CreateSellOrder(buySellRequest);
-            Assert.True(buyOrderResponse.BuyOrderID != Guid.Empty);
+            Assert.True(buyOrderResponse.SellOrderID != Guid.Empty);
         }
         #endregion
         #region GetAllBuyOrders
