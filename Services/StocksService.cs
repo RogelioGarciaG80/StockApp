@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using RepositoryContracts;
 
 namespace Services
 {
@@ -15,13 +16,15 @@ namespace Services
     {
         //private readonly List<BuyOrder> _buyOrders;
         //private readonly List<SellOrder> _sellOrders;
-        private readonly OrdersDbContext _db;
+        //private readonly OrdersDbContext _db;
+        private readonly IStocksRepository _stocksRepository;
 
-        public StocksService(OrdersDbContext ordersDbContext)
+
+        public StocksService(IStocksRepository stocksRepository)
         {
             //_buyOrders = new List<BuyOrder>();
             //_sellOrders = new List<SellOrder>();
-            _db = ordersDbContext;
+            _stocksRepository = stocksRepository;
         }
         
 
@@ -34,8 +37,9 @@ namespace Services
                 BuyOrder buyOrder = buyOrderRequest.ToBuyOrder();
                 buyOrder.BuyOrderID = Guid.NewGuid();
                 //_buyOrders.Add(buyOrder);
-                await _db.BuyOrders.AddAsync(buyOrder);
-                await _db.SaveChangesAsync();
+                //await _db.BuyOrders.AddAsync(buyOrder);
+                //await _db.SaveChangesAsync();
+                BuyOrder buyOrderFromRepo = await _stocksRepository.CreateBuyOrder(buyOrder);
                 return buyOrder.ToBuyOrderResponse();            
         }
 
@@ -47,15 +51,17 @@ namespace Services
                 ValidationHelper.ModelValidation(sellOrderRequest);
                 SellOrder sellOrder = sellOrderRequest.ToSellOrder();
                 sellOrder.SellOrderID = Guid.NewGuid();
-                await _db.SellOrders.AddAsync(sellOrder);
-                await _db.SaveChangesAsync();
-                return sellOrder.ToSellOrderResponse();           
+            //await _db.SellOrders.AddAsync(sellOrder);
+            //await _db.SaveChangesAsync();
+            SellOrder SellOrderFromRepo = await _stocksRepository.CreateSellOrder(sellOrder);
+            return sellOrder.ToSellOrderResponse();           
         }
 
         async Task<List<BuyOrderResponse>> IStocksService.GetBuyOrders()
         {
 
-            var buyOrders  = await _db.BuyOrders.ToListAsync();
+            //var buyOrders  = await _db.BuyOrders.ToListAsync();
+            List<BuyOrder> buyOrders = await _stocksRepository.GetBuyOrders();
             List<BuyOrderResponse> buyOrderResponses  = buyOrders.Select(s => s.ToBuyOrderResponse()).ToList();
             return buyOrderResponses;
             
@@ -63,7 +69,8 @@ namespace Services
 
         async Task<List<SellOrderResponse>> IStocksService.GetSellOrders()
         {
-            var  sellOrders = await _db.SellOrders.ToListAsync();
+            //var  sellOrders = await _db.SellOrders.ToListAsync();
+            List<SellOrder> sellOrders = await _stocksRepository.GetSellOrders();
             List<SellOrderResponse> sellOrderResponses = sellOrders.Select(s => s.ToSellOrderResponse()).ToList();
             return sellOrderResponses;
             
