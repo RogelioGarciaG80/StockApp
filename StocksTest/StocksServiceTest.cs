@@ -1,4 +1,7 @@
-﻿using ServiceContracts;
+﻿using Entities;
+using Repositories;
+using RepositoryContracts;
+using ServiceContracts;
 using ServiceContracts.DTO;
 using Services;
 using System;
@@ -15,8 +18,10 @@ namespace StocksTest
     {
         private readonly IStocksService _stocksService;
         private readonly ITestOutputHelper _testOutputHelper;
+        private readonly IStocksRepository _stocksRepository;
         public StocksServiceTest(ITestOutputHelper testOutputHelper) {
-            _stocksService = new StocksService();
+            _stocksRepository = new Repositories.StocksRepository(null);
+            _stocksService = new StocksService(_stocksRepository);
             _testOutputHelper = testOutputHelper;
         }
 

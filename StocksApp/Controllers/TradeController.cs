@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using ServiceContracts;
 using ServiceContracts.DTO;
 using StocksApp.Models;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace StocksApp.Controllers
 {
@@ -14,6 +16,7 @@ namespace StocksApp.Controllers
         private readonly IStocksService _stocksService;
         private readonly IFinnhubService _finnhubService;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<TradeController> _logger;
 
         /// <summary>
         /// Constructor for TradeController that executes when a new object is created for the class
@@ -22,28 +25,32 @@ namespace StocksApp.Controllers
         /// <param name="stocksService">Injecting StocksService</param>
         /// <param name="finnhubService">Injecting FinnhubService</param>
         /// <param name="configuration">Injecting IConfiguration</param>
-        public TradeController(IOptions<TradingOptions> tradingOptions, IStocksService stocksService, IFinnhubService finnhubService, IConfiguration configuration)
+        public TradeController(IOptions<TradingOptions> tradingOptions, IStocksService stocksService, IFinnhubService finnhubService, IConfiguration configuration, ILogger<TradeController> logger)
         {
             _tradingOptions = tradingOptions.Value;
             _stocksService = stocksService;
             _finnhubService = finnhubService;
             _configuration = configuration;
+            _logger=logger;
         }
 
         [Route("/")]
         [Route("[action]")]
         [Route("~/[controller]")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index(string stockSymbol)
         {
-            if (string.IsNullOrEmpty(_tradingOptions.DefaultStockSymbol))
-                _tradingOptions.DefaultStockSymbol = "MSFT";
+            if (string.IsNullOrEmpty(stockSymbol))
+                stockSymbol = "MSFT";
+
+            _logger.LogInformation("Index action method of Stock Controller");
+            _logger.LogDebug($"stockSymbol: {stockSymbol}");
 
 
             //get company profile from API server
-            Dictionary<string, object>? companyProfileDictionary = _finnhubService.GetCompanyProfile(_tradingOptions.DefaultStockSymbol);
+            Dictionary<string, object>? companyProfileDictionary = await _finnhubService.GetCompanyProfile(stockSymbol);
 
             //get stock price quotes from API server
-            Dictionary<string, object>? stockQuoteDictionary = _finnhubService.GetStockPriceQuote(_tradingOptions.DefaultStockSymbol);
+            Dictionary<string, object>? stockQuoteDictionary = await  _finnhubService.GetStockPriceQuote(stockSymbol);
 
 
             //create model object
