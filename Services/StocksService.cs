@@ -9,6 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using RepositoryContracts;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using SerilogTimings;
 
 namespace Services
 {
@@ -18,13 +21,17 @@ namespace Services
         //private readonly List<SellOrder> _sellOrders;
         //private readonly OrdersDbContext _db;
         private readonly IStocksRepository _stocksRepository;
+        private readonly ILogger<StocksService> _logger;
+        private readonly IDiagnosticContext _diagnosticContext;
 
 
-        public StocksService(IStocksRepository stocksRepository)
+        public StocksService(IStocksRepository stocksRepository,ILogger<StocksService> logger,IDiagnosticContext diagnosticContext)
         {
             //_buyOrders = new List<BuyOrder>();
             //_sellOrders = new List<SellOrder>();
             _stocksRepository = stocksRepository;
+            _logger = logger;
+            _diagnosticContext = diagnosticContext;
         }
         
 
@@ -61,8 +68,12 @@ namespace Services
         {
 
             //var buyOrders  = await _db.BuyOrders.ToListAsync();
-            List<BuyOrder> buyOrders = await _stocksRepository.GetBuyOrders();
-            List<BuyOrderResponse> buyOrderResponses  = buyOrders.Select(s => s.ToBuyOrderResponse()).ToList();
+            List<BuyOrderResponse> buyOrderResponses;
+            using (Operation.Time("Timee for GetBuyOrders"))
+            {
+                List<BuyOrder> buyOrders = await _stocksRepository.GetBuyOrders();
+                buyOrderResponses = buyOrders.Select(s => s.ToBuyOrderResponse()).ToList();
+            }
             return buyOrderResponses;
             
         }
@@ -70,8 +81,12 @@ namespace Services
         async Task<List<SellOrderResponse>> IStocksService.GetSellOrders()
         {
             //var  sellOrders = await _db.SellOrders.ToListAsync();
-            List<SellOrder> sellOrders = await _stocksRepository.GetSellOrders();
-            List<SellOrderResponse> sellOrderResponses = sellOrders.Select(s => s.ToSellOrderResponse()).ToList();
+            List<SellOrderResponse> sellOrderResponses;
+            using (Operation.Time("Timee for GetSellOrders"))
+            {
+                List<SellOrder> sellOrders = await _stocksRepository.GetSellOrders();
+                sellOrderResponses = sellOrders.Select(s => s.ToSellOrderResponse()).ToList();
+            }
             return sellOrderResponses;
             
         }
